@@ -1,26 +1,38 @@
 <script setup>
-import { ref, watch, toRefs } from 'vue'
+import { ref, watch } from 'vue'
 
 const props = defineProps({
   currentUser: { type: String, default: null },
   usernames: { type: Array, default: () => [] }
 })
-const { currentUser, usernames } = toRefs(props)
-const emit = defineEmits(['login', 'load', 'save', 'logout'])
+
+const emit = defineEmits(['login', 'load', 'logout'])
 
 const username = ref('')
 const selectedUser = ref('')
 
-const onLogin = () => username.value.trim() && emit('login', username.value.trim())
-const onLoad = () => {
-  const target = (selectedUser.value || username.value).trim()
-  target && emit('load', target)
+const onLogin = () => {
+  if (username.value.trim()) {
+    emit('login', username.value.trim())
+  }
 }
-const onSave = () => emit('save')
-const onLogout = () => emit('logout')
 
-watch(() => props.currentUser, (u) => {
-  if (u) { username.value = ''; selectedUser.value = '' }
+const onLoad = () => {
+  const target = selectedUser.value || username.value
+  if (target.trim()) {
+    emit('load', target.trim())
+  }
+}
+
+const onLogout = () => {
+  emit('logout')
+}
+
+watch(() => props.currentUser, (newUser) => {
+  if (newUser) {
+    username.value = ''
+    selectedUser.value = ''
+  }
 })
 </script>
 
@@ -37,15 +49,34 @@ watch(() => props.currentUser, (u) => {
     </div>
     <div v-else>
       <span>Connecté: <strong>{{ currentUser }}</strong></span>
-      <button @click="onSave">Sauvegarder</button>
       <button @click="onLogout">Déconnexion</button>
     </div>
   </div>
   </template>
 
 <style scoped>
-.auth { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.auth input, .auth select { padding: 8px 10px; border-radius: 8px; border: 1px solid #ddd; }
+.auth {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.auth input,
+.auth select {
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.auth input:focus,
+.auth select:focus {
+  border-color: #3498db;
+  outline: none;
+}
 </style>
 
 

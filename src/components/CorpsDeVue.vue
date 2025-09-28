@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import AuthBar from './AuthBar.vue'
 import StatsBar from './StatsBar.vue'
@@ -11,8 +11,9 @@ const store = useStore()
 
 const cookies = computed(() => store.getters.cookies)
 const autoRate = computed(() => store.getters.autoRate)
-const avgPerSecond = computed(() => store.getters.stats.avgPerSecond)
+const multiplier = computed(() => store.getters.multiplier)
 const upgrades = computed(() => store.getters.upgrades)
+
 const usernames = computed(() => store.getters.usernames)
 const currentUser = computed(() => store.getters.currentUser)
 const leaderboard = computed(() => store.getters.leaderboard)
@@ -24,10 +25,14 @@ const leaderboardMode = ref('total')
 const buy = (id) => store.dispatch('buyUpgrade', id)
 const nextCost = (id) => store.getters.nextCost(id)
 const onClick = () => store.dispatch('click')
-const login = (u) => store.dispatch('login', u)
-const load = (u) => store.dispatch('load', u)
-const save = () => store.dispatch('save')
+
+const login = (username) => store.dispatch('login', username)
+const load = (username) => store.dispatch('load', username)
 const logout = () => store.dispatch('logout')
+
+onMounted(() => {
+  store.dispatch('initAuto')
+})
 </script>
 
 <template>
@@ -39,11 +44,10 @@ const logout = () => store.dispatch('logout')
       :usernames="usernames"
       @login="login"
       @load="load"
-      @save="save"
       @logout="logout"
     />
 
-    <StatsBar :cookies="cookies" :auto-rate="autoRate" :avg-per-second="avgPerSecond" />
+    <StatsBar :cookies="cookies" :auto-rate="autoRate" :multiplier="multiplier" />
 
     <DimSumButton @click="onClick" />
 
@@ -61,7 +65,15 @@ const logout = () => store.dispatch('logout')
   </template>
 
 <style scoped>
-section { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 24px; }
+section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
 </style>
 
 

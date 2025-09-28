@@ -1,6 +1,6 @@
 # Dim Sum Clicker
 
-![Demo](demo.gif)
+![Demo](src/assets/demo.gif)
 
 ## Fonctionnalités
 
